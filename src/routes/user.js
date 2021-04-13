@@ -3,36 +3,62 @@ const router = express.Router();
 
 const User = require('../models/user')
 
-/** Route to get all users. */
+// Get all users
 router.get('/', (req, res) => {
-    return res.send(`All Users route`)
+  User.find().then((users) => {
+    return res.json({ users })
+  })
+    .catch((err) => {
+      throw err.message
+    });
 })
 
-/** Route to get one user by id. */
+// Get a user by ID
 router.get('/:userId', (req, res) => {
-    return res.send(`User with id ${req.params.userId}`)
+  console.log(`User id: ${req.params.userId}`)
+  User.findById(req.params.userId).then((user) => {
+    return res.json({ user })
+  })
+    .catch((err) => {
+      throw err.message
+    });
 })
 
-/** Route to add a new user to the database. */
+// Create new user
 router.post('/', (req, res) => {
-    return res.send({
-        message: 'Create new user',
-        data: req.body
-    })
+  let user = new User(req.body)
+
+  user.save().then(userResult => {
+    return res.json({ user: userResult })
+  }).catch((err) => {
+    throw err.message
+  })
+
+  console.log(user)
 })
 
-/** Route to update an existing user. */
+// Update a user
 router.put('/:userId', (req, res) => {
-    return res.send({
-        message: `Update user with id ${req.params.userId}`,
-        data: req.body
+  User.findByIdAndUpdate(req.params.userId, req.body).then((user) => {
+    return res.json({ user })
+  }).catch((err) => {
+    throw err.message
+  })
+})
+
+// Delete a user
+router.delete('/:userId', (req, res) => {
+  User.findByIdAndDelete(req.params.userId).then(() => {
+    return res.json({
+      'message': 'Successfully deleted.',
+      '_id': req.params.userId
+    })
+  })
+    .catch((err) => {
+      throw err.message
     })
 })
 
-/** Route to delete a user. */
-router.delete('/:userId', (req, res) => {
-    return res.send(`Delete user with id ${req.params.userId}`)
-})
 
 module.exports = router
 
